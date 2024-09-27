@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    <!-- Cabeçalho -->
     <header class="top-nav">
         <div class="logo">Minha Plataforma</div>
         <nav>
@@ -16,8 +17,8 @@
             </ul>
         </nav>
         <div class="auth-buttons">
-            <button class="login-btn">Entrar</button>
-            <button class="signup-btn">Cadastre-se</button>
+            <button class="login-btn" onclick="openLoginPopup()">Entrar</button>
+            <button class="signup-btn" onclick="openSignupPopup()">Cadastre-se</button>
         </div>
     </header>
 
@@ -57,7 +58,7 @@
                     <h1>Bem-vindo à Plataforma de Apostas!</h1>
                     <p>Cadastre-se e receba bônus de depósito de até R$ 1.000!</p>
                     <div class="action-buttons">
-                        <button class="signup-btn-large">CADASTRE-SE</button>
+                        <button class="signup-btn-large" onclick="openSignupPopup()">CADASTRE-SE</button>
                         <button class="google-btn">G</button>
                     </div>
                 </div>
@@ -79,11 +80,57 @@
         </main>
     </div>
 
+    <!-- Popup de Cadastro -->
+    <div id="signupPopup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup('signupPopup')">&times;</span>
+            <h2>Cadastre-se na Plataforma</h2>
+            <form>
+                <input type="text" placeholder="Nome" required>
+                <input type="email" placeholder="Endereço de Email" required>
+                <input type="password" placeholder="Senha" required>
+                <input type="date" placeholder="Data de Nascimento" required>
+                <div class="terms">
+                    <p>Ao se inscrever você concorda com os <a href="#">Termos de Serviço</a></p>
+                </div>
+                <button type="submit" class="submit-btn">Comece já!</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup de Login -->
+    <div id="loginPopup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup('loginPopup')">&times;</span>
+            <h2>Login na Plataforma</h2>
+            <form>
+                <input type="email" placeholder="Endereço de Email" required>
+                <input type="password" placeholder="Senha" required>
+                
+                <button type="submit" class="submit-btn">Entrar</button>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-content">
             <p>Método de Pagamento Preferido</p>
-            <!-- Insira logos de parceiros de pagamento -->
         </div>
     </footer>
+
+    <script>
+        // Funções para abrir e fechar os popups
+        function openSignupPopup() {
+            document.getElementById("signupPopup").style.display = "block";
+        }
+
+        function openLoginPopup() {
+            document.getElementById("loginPopup").style.display = "block";
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = "none";
+        }
+    </script>
 </body>
 </html>
