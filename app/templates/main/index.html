@@ -1,13 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Página Inicial - Plataforma de Apostas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <h1>Bem-vindo à Home Page</h1>
-    <a href="{{ url_for('auth.login') }}">Login</a> |
-    <a href="{{ url_for('main.about') }}">Sobre</a>
+    <header class="top-nav">
+        <div class="logo">Minha Plataforma</div>
+        <nav>
+            <ul>
+                <li><a href="#">Cassino</a></li>
+                <li><a href="#">Esportes</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <button class="login-btn">Entrar</button>
+            <button class="signup-btn">Cadastre-se</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="bonus-btn">Ganhe R$20 Grátis</button>
+            <ul class="menu">
+                <li>
+                    <h3>Final Campeonato</h3>
+                    <p>Restam 2 dias para o fim das apostas.</p>
+                    <button class="bet-btn">Apostar</button>
+                </li>
+                <li>
+                    <h3>Eleição Presidencial</h3>
+                    <p>Restam 5 dias para o fim das apostas.</p>
+                    <button class="bet-btn">Apostar</button>
+                </li>
+                <li>
+                    <h3>Bolsa de Valores</h3>
+                    <p>Ações subindo ou caindo em 24 horas.</p>
+                    <button class="bet-btn">Apostar</button>
+                </li>
+                <li>
+                    <h3>Olimpíadas - Natação</h3>
+                    <p>Quem ganhará o ouro?</p>
+                    <button class="bet-btn">Apostar</button>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <main class="content">
+            <!-- Card principal de boas-vindas -->
+            <section class="welcome-card">
+                <div class="card">
+                    <h1>Bem-vindo à Plataforma de Apostas!</h1>
+                    <p>Cadastre-se e receba bônus de depósito de até R$ 1.000!</p>
+                    <div class="action-buttons">
+                        <button class="signup-btn-large">CADASTRE-SE</button>
+                        <button class="google-btn">G</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção de categorias e links -->
+            <section class="categories-cards">
+                <div class="card">
+                    <h2>Cassino</h2>
+                    <p>Aproveite nossa seleção exclusiva de slots, dealers ao vivo e jogos originais.</p>
+                    <button class="category-btn">IR AO CASSINO</button>
+                </div>
+                <div class="card">
+                    <h2>Esportes</h2>
+                    <p>Nossas apostas esportivas intuitivas são feitas para jogadores novos e experientes.</p>
+                    <button class="category-btn">IR PARA ESPORTES</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Método de Pagamento Preferido</p>
+            <!-- Insira logos de parceiros de pagamento -->
+        </div>
+    </footer>
 </body>
 </html>
