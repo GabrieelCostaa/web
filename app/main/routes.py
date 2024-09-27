@@ -5,6 +5,6 @@ from . import main_bp
 def index():
     return render_template('main/index.html')
 
-@main_bp.route('/about')
+@main_bp.route('/addNewEvent')
 def about():
-    return render_template('main/about.html')
+    return render_template('main/addNewEvent.html')

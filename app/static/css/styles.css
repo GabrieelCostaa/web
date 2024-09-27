@@ -9,6 +9,21 @@ body {
     height: 100vh;
 }
 
+
+.create-bet-btn {
+    background-color: #f53b57;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.create-bet-btn:hover {
+    background-color: #ff4757;
+}
+
 /* Cabeçalho */
 .top-nav {
     display: flex;
@@ -112,6 +127,52 @@ body {
     cursor: pointer;
     margin-top: 5px;
     font-size: 12px;
+}
+
+/* Área do formulário de criação de aposta */
+.form-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #2d3238;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.form-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-container input, .form-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: none;
+}
+
+.form-container button {
+    background-color: #f53b57;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+}
+
+.form-container button:hover {
+    background-color: #ff4757;
 }
 
 /* Área de Conteúdo */
