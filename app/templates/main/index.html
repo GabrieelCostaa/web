@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Inicial - Plataforma de Apostas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
+
 <body>
     <!-- Cabeçalho -->
     <header class="top-nav">
@@ -103,10 +106,10 @@
         <div class="popup-content">
             <span class="close" onclick="closePopup('loginPopup')">&times;</span>
             <h2>Login na Plataforma</h2>
-            <form action="{{ url_for('auth.login') }}" method="POST">  <!-- Envia o formulário para a rota /login -->
+            <form action="{{ url_for('auth.login') }}" method="POST"> <!-- Envia o formulário para a rota /login -->
                 <input type="email" name="email" placeholder="Endereço de Email" required>
                 <input type="password" name="senha" placeholder="Senha" required>
-                
+
                 <button type="submit" class="submit-btn">Entrar</button>
             </form>
         </div>
@@ -117,6 +120,40 @@
             <p>Método de Pagamento Preferido</p>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function showSuccessMessage() {
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Login realizado com sucesso.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        function showFailureMessage() {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Email ou Senha invalida.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
+
+    <script>
+        var success = {{ session.pop('success', False) | tojson }};
+        if (success) {
+            showSuccessMessage();
+        }
+
+        var error = {{ session.pop('error', False) | tojson }};
+        if (error) {
+            showFailureMessage();
+        }
+    </script>
 
     <script>
         // Funções para abrir e fechar os popups
@@ -133,4 +170,5 @@
         }
     </script>
 </body>
+
 </html>
