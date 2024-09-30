@@ -85,11 +85,11 @@
         <div class="popup-content">
             <span class="close" onclick="closePopup('signupPopup')">&times;</span>
             <h2>Cadastre-se na Plataforma</h2>
-            <form>
-                <input type="text" placeholder="Nome" required>
-                <input type="email" placeholder="Endereço de Email" required>
-                <input type="password" placeholder="Senha" required>
-                <input type="date" placeholder="Data de Nascimento" required>
+            <form action="{{ url_for('auth.register') }}" method="POST">
+                <input type="text" name="nome" placeholder="Nome" required>
+                <input type="email" name="email" placeholder="Endereço de Email" required>
+                <input type="password" name="senha" placeholder="Senha" required>
+                <input type="date" name="data_nascimento" placeholder="Data de Nascimento" required>
                 <div class="terms">
                     <p>Ao se inscrever você concorda com os <a href="#">Termos de Serviço</a></p>
                 </div>
@@ -103,9 +103,9 @@
         <div class="popup-content">
             <span class="close" onclick="closePopup('loginPopup')">&times;</span>
             <h2>Login na Plataforma</h2>
-            <form>
-                <input type="email" placeholder="Endereço de Email" required>
-                <input type="password" placeholder="Senha" required>
+            <form action="/login" method="POST">  <!-- Envia o formulário para a rota /login -->
+                <input type="email" name="email" placeholder="Endereço de Email" required>
+                <input type="password" name="senha" placeholder="Senha" required>
                 
                 <button type="submit" class="submit-btn">Entrar</button>
             </form>
