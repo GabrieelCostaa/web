@@ -103,7 +103,7 @@
         <div class="popup-content">
             <span class="close" onclick="closePopup('loginPopup')">&times;</span>
             <h2>Login na Plataforma</h2>
-            <form action="/login" method="POST">  <!-- Envia o formulário para a rota /login -->
+            <form action="{{ url_for('auth.login') }}" method="POST">  <!-- Envia o formulário para a rota /login -->
                 <input type="email" name="email" placeholder="Endereço de Email" required>
                 <input type="password" name="senha" placeholder="Senha" required>
                 

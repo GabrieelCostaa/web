@@ -50,8 +50,8 @@ def login():
     if usuario and usuario['senha'] == senha:
         flash('Login realizado com sucesso!')
         # Aqui você pode iniciar a sessão ou redirecionar para uma página protegida
-        return redirect(url_for('main_bp.index'))
+        return redirect(url_for('main.index'))
     else:
         flash('Email ou senha inválidos.')
-        return redirect(url_for('main_bp.index'))
+        return redirect(url_for('main.index'))
 
