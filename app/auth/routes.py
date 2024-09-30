@@ -50,6 +50,7 @@ def login():
     if usuario and usuario['senha'] == senha:
         flash('Login realizado com sucesso!')
         # Aqui você pode iniciar a sessão ou redirecionar para uma página protegida
+        session['nome'] = usuario['nome']
         session['success'] = True
         return redirect(url_for('main.index'))
     else:
@@ -57,4 +58,12 @@ def login():
     
         session['error'] = True
         return redirect(url_for('main.index'))
+    
+    
+@auth_bp.route('/logout')
+def logout():
+    # Limpa a sessão do usuário
+    session.clear()
+    flash('Você saiu da sua conta.')
+    return redirect(url_for('main.index'))
 

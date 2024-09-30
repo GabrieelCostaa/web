@@ -55,7 +55,18 @@ body {
     gap: 10px;
 }
 
-.login-btn, .signup-btn {
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-info span {
+    font-size: 1.2em;
+    color: #fff;
+}
+
+.login-btn, .signup-btn, .logout-btn {
     background-color: #f53b57;
     border: none;
     padding: 10px 20px;
