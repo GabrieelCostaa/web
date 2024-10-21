@@ -40,27 +40,16 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <button class="create-bet-btn" onclick="window.location.href='/addNewEvent'">Criar Aposta</button>
+            <button class="ver-pendentes-btn" onclick="window.location.href='/eventos_pendentes'">Ver Pendentes</button>
             <ul class="menu">
+                {% for evento in eventos %}
                 <li>
-                    <h3>Final Campeonato</h3>
-                    <p>Restam 2 dias para o fim das apostas.</p>
+                    <h3>{{ evento['titulo'] }}</h3>
+                    <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                    <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
                     <button class="bet-btn">Apostar</button>
                 </li>
-                <li>
-                    <h3>Eleição Presidencial</h3>
-                    <p>Restam 5 dias para o fim das apostas.</p>
-                    <button class="bet-btn">Apostar</button>
-                </li>
-                <li>
-                    <h3>Bolsa de Valores</h3>
-                    <p>Ações subindo ou caindo em 24 horas.</p>
-                    <button class="bet-btn">Apostar</button>
-                </li>
-                <li>
-                    <h3>Olimpíadas - Natação</h3>
-                    <p>Quem ganhará o ouro?</p>
-                    <button class="bet-btn">Apostar</button>
-                </li>
+                {% endfor %}
             </ul>
         </aside>
 

@@ -1,0 +1,28 @@
+<h2>Eventos Pendentes de Aprovação</h2>
+<ul class="menu">
+    {% for evento in eventos %}
+        <li>
+            <h3>{{ evento['titulo'] }}</h3>
+            <p>Descrição: {{ evento['descricao'] }}</p>
+            <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+            <button class="approve-btn" onclick="aprovarEvento('{{ evento['_id'] }}')">Aprovar</button>
+        </li>
+    {% endfor %}
+</ul>
+
+<script>
+function aprovarEvento(eventoId) {
+    fetch('/aprovar_evento/' + eventoId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (response.ok) {
+            alert("Evento aprovado com sucesso!");
+            location.reload();
+            window.location.href = "/";
+        }
+    });
+}
+</script>
