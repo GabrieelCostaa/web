@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, Blueprint, session
 from app.database import usuarios_collection  # Certifique-se de importar a coleção de usuários do MongoDB
 from werkzeug.security import generate_password_hash, check_password_hash
+from bson import ObjectId
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -49,13 +50,15 @@ def login():
 
     if usuario and usuario['senha'] == senha:
         flash('Login realizado com sucesso!')
-        # Aqui você pode iniciar a sessão ou redirecionar para uma página protegida
+        
+        # Armazena o _id do usuário e o nome na sessão
+        session['usuario_id'] = str(usuario['_id'])  # Converte o ObjectId para string
         session['nome'] = usuario['nome']
         session['success'] = True
+        
         return redirect(url_for('main.index'))
     else:
         flash('Email ou senha inválidos.')
-    
         session['error'] = True
         return redirect(url_for('main.index'))
     

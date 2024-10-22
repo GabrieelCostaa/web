@@ -21,11 +21,16 @@
             </ul>
         </nav>
         {% if session.get('nome') %}
-        <div class="user-info">
-            <span>Bem-vindo, {{ session['nome'] }}!</span>
-            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </a>
+        <div class="user-wallet">
+            <div class="user-info">
+                <span>Bem-vindo, {{ session['nome'] }}!</span>
+                <!-- Exibe o saldo da wallet do usuário -->
+                <span class="wallet-info">Saldo: R$ {{ usuario['wallet_balance'] | default(0) }}</span>
+                <button class="add-funds-btn" onclick="openWalletPopup()">Adicionar Saldo</button>
+                <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
         </div>
         {% else %}
         <!-- Exibe os botões de login e cadastro -->
@@ -115,6 +120,19 @@
         </div>
     </div>
 
+    <!-- Popup para adicionar saldo -->
+    <div id="walletPopup" class="wallet-popup">
+        <div class="popup-content">
+            <span class="close" onclick="closeWalletPopup()">&times;</span>
+            <h2>Adicionar Saldo</h2>
+            <form id="walletForm" action="/adicionar_saldo" method="POST">
+                <label for="amount">Valor em Reais:</label>
+                <input type="number" id="amount" name="amount" min="1" step="0.01" required>
+                <button type="submit" class="submit-btn">Adicionar</button>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-content">
             <p>Método de Pagamento Preferido</p>
@@ -124,6 +142,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+
+        function openWalletPopup() {
+            document.getElementById("walletPopup").style.display = "flex";
+        }
+
+        function closeWalletPopup() {
+            document.getElementById("walletPopup").style.display = "none";
+        }
         function showSuccessMessage() {
             Swal.fire({
                 title: 'Sucesso!',

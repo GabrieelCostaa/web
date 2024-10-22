@@ -66,7 +66,7 @@ body {
     color: #fff;
 }
 
-.login-btn, .signup-btn, .logout-btn {
+.login-btn, .signup-btn, .logout-btn, .add-funds-btn {
     background-color: #f53b57;
     border: none;
     padding: 10px 20px;
@@ -337,3 +337,34 @@ footer {
     text-align: center;
     color: #bcbfc7;
 }
+
+.wallet-info {
+    margin-left: 15px;
+    font-weight: bold;
+    color: #e65c43;  /* Cor verde para saldo */
+}
+
+.user-wallet {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgb
+    a(0, 0, 0, 0.1);
+}
+
+.wallet-popup {
+    display: none;  /* O popup está escondido inicialmente */
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);  /* Fundo semi-transparente */
+    justify-content: center;
+    align-items: center;
+}
+
+

@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash, session
-from app.database import eventos_collection  # Certifique-se de importar a coleção de usuários do MongoDB
+from app.database import eventos_collection, usuarios_collection # Certifique-se de importar a coleção de usuários do MongoDB
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import main_bp  # Importando o blueprint
 from datetime import datetime
@@ -10,7 +10,18 @@ def index():
     # Buscar todos os eventos aprovados
     eventos_aprovados = eventos_collection.find({"aprovado": True})
     now = datetime.utcnow()
-    return render_template('main/index.html', eventos=eventos_aprovados, now=now)
+
+    # Verificar se o usuário está logado e buscar suas informações
+    if 'usuario_id' in session:
+        usuario = usuarios_collection.find_one({"_id": ObjectId(session['usuario_id'])})
+    else:
+        usuario = None
+
+    # Passar o saldo e nome do usuário junto com os eventos para o template
+    return render_template('main/index.html', 
+                           eventos=eventos_aprovados, 
+                           now=now, 
+                           usuario=usuario)
 
 @main_bp.route('/addNewEvent', methods=['GET', 'POST'])
 def new_event():
@@ -73,4 +84,40 @@ def aprovar_evento(evento_id):
     eventos_collection.update_one({"_id": ObjectId(evento_id)}, {"$set": {"aprovado": True}})
     flash('Evento aprovado com sucesso!')
     return '', 204  # Retorna uma resposta vazia indicando sucesso  
+
+
+@main_bp.route('/adicionar_saldo', methods=['POST'])
+def adicionar_saldo():
+    if 'usuario_id' in session:
+        user_id = session['usuario_id']
+        valor = float(request.form.get('amount', 0))
+
+        # Atualizar o saldo da carteira no banco de dados
+        usuarios_collection.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$inc": {"wallet_balance": valor}}
+        )
+        
+        flash('Saldo adicionado com sucesso!')
+        return redirect(url_for('main.index'))
+    
+    flash('Você precisa estar logado para adicionar saldo.')
+    return redirect(url_for('main.index'))
+
+@main_bp.route('/some_protected_route')
+def pagina_protegida():
+    # Verifica se o usuário está logado
+    if 'usuario_id' in session:
+        # Busca o usuário pelo ID armazenado na sessão
+        usuario = usuarios_collection.find_one({"_id": ObjectId(session['usuario_id'])})
+
+        if usuario:
+            # Passa o saldo do usuário para o template
+            return render_template('main/index.html', usuario=usuario)
+        else:
+            flash('Usuário não encontrado.')
+            return redirect(url_for('main.index'))
+    else:
+        flash('Você precisa estar logado para acessar esta página.')
+        return redirect(url_for('main.index'))
 
