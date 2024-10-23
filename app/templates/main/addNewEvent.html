@@ -10,12 +10,9 @@
 
 <body>
     <header class="top-nav">
-        <div class="logo">Minha Plataforma</div>
         <nav>
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="#">Cassino</a></li>
-                <li><a href="#">Esportes</a></li>
+                <li><a href="/">Voltar</a></li>
             </ul>
         </nav>
     </header>
@@ -34,7 +31,7 @@
 
                 <!-- Valor da cota -->
                 <label for="valor_cota">Valor de cada cota (mínimo de R$1,00):</label>
-                <input type="number" id="valor_cota" name="valor_cota" min="1" step="0.01" required>
+                <input type="number" id="valor_cota" name="valor_cota" min="1" step="0.05" required>
 
                 <!-- Período de recebimento das apostas -->
                 <label for="inicio_apostas_data">Data de início do período de apostas:</label>
@@ -52,6 +49,13 @@
                 <!-- Data do evento -->
                 <label for="data_evento">Data do evento (dia/mês/ano):</label>
                 <input type="date" id="data_evento" name="data_evento" required>
+
+                <label for="categoria">Categoria do Evento:</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="Olimpiadas">Olimpíadas</option>
+                    <option value="Eleicoes">Eleições</option>
+                    <option value="Futebol">Futebol</option>
+                </select>
 
                 <!-- Botão para submeter -->
                 <button type="submit" class="submit-btn">Criar Evento</button>

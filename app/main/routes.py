@@ -1,27 +1,40 @@
+import pymongo
 from flask import render_template, request, redirect, url_for, flash, session
 from app.database import eventos_collection, usuarios_collection # Certifique-se de importar a coleção de usuários do MongoDB
-from werkzeug.security import generate_password_hash, check_password_hash
 from . import main_bp  # Importando o blueprint
 from datetime import datetime
 from bson import ObjectId
 
 @main_bp.route('/')
 def index():
-    # Buscar todos os eventos aprovados
-    eventos_aprovados = eventos_collection.find({"aprovado": True})
     now = datetime.utcnow()
-
     # Verificar se o usuário está logado e buscar suas informações
     if 'usuario_id' in session:
         usuario = usuarios_collection.find_one({"_id": ObjectId(session['usuario_id'])})
     else:
         usuario = None
+        
+    # Buscar todos os eventos aprovados
+    eventos_aprovados = eventos_collection.find({"aprovado": True})   
+        
+     # Buscar eventos próximos de vencer
+    eventos_proximos_de_vencer = eventos_collection.find({
+        "aprovado": True,
+        "fim_apostas": {"$gte": now}
+    }).sort("fim_apostas", 1).limit(5)  # Pegar os 5 eventos mais próximos de terminar 
+    
+     # Buscar eventos mais apostados (exemplo de campo 'num_apostas')
+    eventos_mais_apostados = eventos_collection.find({
+        "aprovado": True
+    }).sort("num_apostas", pymongo.ASCENDING).limit(5)  # Pegar os 5 mais apostados   
 
     # Passar o saldo e nome do usuário junto com os eventos para o template
     return render_template('main/index.html', 
                            eventos=eventos_aprovados, 
-                           now=now, 
-                           usuario=usuario)
+                           eventos_proximos_de_vencer=eventos_proximos_de_vencer, 
+                           eventos_mais_apostados=eventos_mais_apostados, 
+                           now=now,
+                           usuario = usuario)
 
 @main_bp.route('/addNewEvent', methods=['GET', 'POST'])
 def new_event():
@@ -29,6 +42,7 @@ def new_event():
         titulo = request.form.get('titulo')
         descricao = request.form.get('descricao')
         valor_cota = request.form.get('valor_cota')
+        categoria = request.form.get('categoria')
         
         # Captura os campos de data e hora separados para o início do período de apostas
         inicio_apostas_data = request.form.get('inicio_apostas_data')
@@ -50,7 +64,9 @@ def new_event():
             "inicio_apostas": inicio_apostas,
             "fim_apostas": fim_apostas,
             "data_evento": data_evento,
-            "aprovado": False # Evento começa como não aprovado
+            "categoria": categoria,
+            "aprovado": False, # Evento começa como não aprovado
+            "num_apostas": 0  # Inicializando o contador de apostas
         }
 
         eventos_collection.insert_one(novo_evento)
@@ -104,20 +120,27 @@ def adicionar_saldo():
     flash('Você precisa estar logado para adicionar saldo.')
     return redirect(url_for('main.index'))
 
-@main_bp.route('/some_protected_route')
-def pagina_protegida():
-    # Verifica se o usuário está logado
-    if 'usuario_id' in session:
-        # Busca o usuário pelo ID armazenado na sessão
-        usuario = usuarios_collection.find_one({"_id": ObjectId(session['usuario_id'])})
 
-        if usuario:
-            # Passa o saldo do usuário para o template
-            return render_template('main/index.html', usuario=usuario)
-        else:
-            flash('Usuário não encontrado.')
-            return redirect(url_for('main.index'))
-    else:
-        flash('Você precisa estar logado para acessar esta página.')
-        return redirect(url_for('main.index'))
+@main_bp.route('/buscar_eventos')
+def buscar_eventos():
+    query = request.args.get('search_query')
+    eventos_encontrados = eventos_collection.find({
+        "titulo": {"$regex": query, "$options": "i"},
+        "aprovado": True
+    })
+    now = datetime.utcnow()
+    
+    return render_template('main/eventos_encontrados.html', eventos=eventos_encontrados, now = now)
+
+@main_bp.route('/eventos/categoria/<nome_categoria>')
+def eventos_por_categoria(nome_categoria):
+    now = datetime.utcnow()
+
+    # Buscar eventos da categoria de forma case-insensitive
+    eventos_categoria = eventos_collection.find({
+        "aprovado": True,
+        "categoria": {"$regex": f"^{nome_categoria}$", "$options": "i"}  # Busca case-insensitive
+    })
+
+    return render_template('main/eventos_categoria.html', eventos=eventos_categoria, now=now, categoria=nome_categoria)
 

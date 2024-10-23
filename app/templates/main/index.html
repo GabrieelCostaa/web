@@ -23,7 +23,7 @@
         {% if session.get('nome') %}
         <div class="user-wallet">
             <div class="user-info">
-                <span>Bem-vindo, {{ session['nome'] }}!</span>
+                <span class="welcome-user">Bem-vindo, {{ session['nome'] }}!</span>
                 <!-- Exibe o saldo da wallet do usuário -->
                 <span class="wallet-info">Saldo: R$ {{ usuario['wallet_balance'] | default(0) }}</span>
                 <button class="add-funds-btn" onclick="openWalletPopup()">Adicionar Saldo</button>
@@ -46,8 +46,21 @@
         <aside class="sidebar">
             <button class="create-bet-btn" onclick="window.location.href='/addNewEvent'">Criar Aposta</button>
             <button class="ver-pendentes-btn" onclick="window.location.href='/eventos_pendentes'">Ver Pendentes</button>
+            <h3>Eventos</h3>
             <ul class="menu">
                 {% for evento in eventos %}
+                <li>
+                    <h3>{{ evento['titulo'] }}</h3>
+                    <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                    <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
+                    <button class="bet-btn">Apostar</button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <h3>Próximos de Vencer</h3>
+            <ul class="menu">
+                {% for evento in eventos_proximos_de_vencer %}
                 <li>
                     <h3>{{ evento['titulo'] }}</h3>
                     <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
@@ -61,28 +74,41 @@
         <!-- Conteúdo principal -->
         <main class="content">
             <!-- Card principal de boas-vindas -->
-            <section class="welcome-card">
-                <div class="card">
-                    <h1>Bem-vindo à Plataforma de Apostas!</h1>
-                    <p>Cadastre-se e receba bônus de depósito de até R$ 1.000!</p>
-                    <div class="action-buttons">
-                        <button class="signup-btn-large" onclick="openSignupPopup()">CADASTRE-SE</button>
-                        <button class="google-btn">G</button>
-                    </div>
-                </div>
+        
+            <div class="search-bar">
+                <form action="/buscar_eventos" method="GET">
+                    <input type="text" name="search_query" placeholder="Buscar eventos..." required>
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>
+
+            <!-- Seção de eventos mais apostados -->
+            <section class="most-bet-events">
+                <h2>Eventos Mais Apostados</h2>
+                <ul class="menu">
+                    {% for evento in eventos_mais_apostados %}
+                    <li>
+                        <h3>{{ evento['titulo'] }}</h3>
+                        <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                        <button class="bet-btn">Apostar</button>
+                    </li>
+                    {% endfor %}
+                </ul>
             </section>
 
-            <!-- Seção de categorias e links -->
+            <!-- Seção de categorias -->
             <section class="categories-cards">
-                <div class="card">
-                    <h2>Cassino</h2>
-                    <p>Aproveite nossa seleção exclusiva de slots, dealers ao vivo e jogos originais.</p>
-                    <button class="category-btn">IR AO CASSINO</button>
+                <div class="card" onclick="window.location.href='/eventos/categoria/Olimpiadas'">
+                    <h2>Olimpíadas</h2>
+                    <p>Eventos relacionados às Olimpíadas.</p>
                 </div>
-                <div class="card">
-                    <h2>Esportes</h2>
-                    <p>Nossas apostas esportivas intuitivas são feitas para jogadores novos e experientes.</p>
-                    <button class="category-btn">IR PARA ESPORTES</button>
+                <div class="card" onclick="window.location.href='/eventos/categoria/Eleicoes'">
+                    <h2>Eleições</h2>
+                    <p>Eventos relacionados às Eleições.</p>
+                </div>
+                <div class="card" onclick="window.location.href='/eventos/categoria/Futebol'">
+                    <h2>Futebol</h2>
+                    <p>Eventos relacionados à Futebol.</p>
                 </div>
             </section>
         </main>
@@ -135,7 +161,6 @@
 
     <footer>
         <div class="footer-content">
-            <p>Método de Pagamento Preferido</p>
         </div>
     </footer>
 
