@@ -110,13 +110,18 @@ def aprovar_evento(evento_id):
 @main_bp.route('/minha_carteira')
 def minha_carteira():
     if 'usuario_id' in session:
+        auto_open = session.get('auto_open', False)  # Verifica se auto_open está ativo
+        session['auto_open'] = False  # Reseta auto_open para garantir que não fique ativo para sempre
+        print(f"Valor de auto_open: {auto_open}")
+        
         usuario = usuarios_collection.find_one({"_id": ObjectId(session['usuario_id'])})
         transacoes = transactions_collection.find({"user_id": ObjectId(session['usuario_id'])})
         if usuario:
-            return render_template('main/minha_carteira.html', usuario=usuario, transacoes=transacoes)
+            return render_template('main/minha_carteira.html', usuario=usuario, transacoes=transacoes, auto_open=auto_open)
     else:
         flash("Você precisa estar logado para acessar sua carteira.")
         return redirect(url_for('main.index'))
+
     
 def calcular_taxa(valor_saque):
     if valor_saque <= 100:

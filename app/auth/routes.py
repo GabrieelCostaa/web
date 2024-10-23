@@ -28,6 +28,11 @@ def register():
         # Mensagem de sucesso e redireciona de volta para o index
         flash('Usuário registrado com sucesso!', 'success')
         return redirect(url_for('main.index'))  # Redireciona para a rota principal (index)
+    
+@auth_bp.route('/set_auto_open', methods=['POST'])
+def set_auto_open():
+    session['auto_open'] = True  # Ativa o auto_open para abrir o popup
+    return '', 204  # Retorna uma resposta vazia e um status 204 No Content
 
 # Rota para login de usuário
 @auth_bp.route('/login', methods=['POST'])

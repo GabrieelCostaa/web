@@ -106,4 +106,20 @@
     }
 </script>
 
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        var autoOpen = "{{ auto_open | tojson }}";  // Pega o valor do session para auto abrir o popup
+        
+        console.log("Valor de autoOpen:", typeof autoOpen, autoOpen);  // Para verificar o valor de autoOpen no console
+        
+        if (autoOpen === true || autoOpen === "True" || autoOpen === "true") {  // Verifica se autoOpen é explicitamente true
+            console.log("Abrindo popup de saldo automaticamente");
+            openWalletPopup();  // Chama a função que abre o popup
+        } else {
+            console.log("Nenhuma ação necessária para autoOpen");
+        }
+    });
+</script>
+
+
 </html>
