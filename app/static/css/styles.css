@@ -16,7 +16,9 @@ html, body {
     box-sizing: border-box;  /* Inclui padding e borda no cálculo de tamanho dos elementos */
 }
 
-
+a {
+    text-decoration: none;
+}
 .create-bet-btn {
     background-color: #f53b57;
     color: white;
@@ -74,7 +76,76 @@ html, body {
     color: #fff;
 }
 
-.login-btn, .signup-btn, .logout-btn, .add-funds-btn {
+.transaction-history {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #2d3238;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-history h3 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: white;
+    text-align: center;
+}
+
+.transaction-history table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-history table thead th {
+    background-color: #3e4551;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+}
+
+.transaction-history table tbody td {
+    background-color: #333;
+    color: #bcbfc7;
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #444;
+}
+
+.transaction-history table tbody tr:hover {
+    background-color: #3e4551;
+}
+
+.transaction-history table tbody td:first-child {
+    font-weight: bold;
+}
+
+.transaction-history table tbody td:last-child {
+    text-align: center;
+}
+
+.transaction-history .icon {
+    font-size: 18px;
+    margin-right: 5px;
+    color: #00ff7f; /* Cor para depósito (verde) */
+}
+
+.transaction-history .icon-saque {
+    color: #f53b57; /* Cor para saque (vermelho) */
+}
+
+.wallet-container{
+    display: flex;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    padding-top: 15px;
+    width: 100%; 
+    max-width: 1200px; 
+    margin: 0 auto; /* Centraliza o container horizontalmente */
+}
+
+.login-btn, .signup-btn, .logout-btn, .add-funds-btn, .withdraw-funds-btn {
     background-color: #f53b57;
     border: none;
     padding: 10px 20px;
@@ -441,6 +512,36 @@ footer {
     border: none;
     border-radius: 0 5px 5px 0; /* Bordas arredondadas na direita */
     cursor: pointer;
+}
+
+
+.back-button-container {
+    margin-top: 20px;
+    text-align: left; /* Botão alinhado à esquerda */
+}
+
+.back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f53b57;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #d83f5a; /* Cor ao passar o mouse */
+}
+
+.back-button i {
+    margin-right: 8px;
+}
+.user-info i{
+    margin-right: 2px;
 }
 
 

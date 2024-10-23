@@ -7,7 +7,7 @@
     <title>Página Inicial - Plataforma de Apostas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 
 <body>
@@ -26,7 +26,8 @@
                 <span class="welcome-user">Bem-vindo, {{ session['nome'] }}!</span>
                 <!-- Exibe o saldo da wallet do usuário -->
                 <span class="wallet-info">Saldo: R$ {{ usuario['wallet_balance'] | default(0) }}</span>
-                <button class="add-funds-btn" onclick="openWalletPopup()">Adicionar Saldo</button>
+                <a href="{{ url_for('main.minha_carteira') }}" class="logout-btn">
+                    <i class="fa-solid fa-wallet"></i> Minha Carteira</a>
                 <a href="{{ url_for('auth.logout') }}" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Sair
                 </a>
@@ -167,14 +168,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-
-        function openWalletPopup() {
-            document.getElementById("walletPopup").style.display = "flex";
-        }
-
-        function closeWalletPopup() {
-            document.getElementById("walletPopup").style.display = "none";
-        }
         function showSuccessMessage() {
             Swal.fire({
                 title: 'Sucesso!',

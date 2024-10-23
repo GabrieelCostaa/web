@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha carteira</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<div class="wallet-container">
+    <h2>Minha Carteira</h2>
+
+    <div class="wallet-info">
+        <p>Saldo atual: R$ {{ usuario['wallet_balance'] | default(0) }}</p>
+    </div>
+
+    <div class="wallet-actions">
+        <button class="add-funds-btn" onclick="openWalletPopup()">Adicionar Créditos</button>
+        <button class="withdraw-funds-btn" onclick="openWithdrawPopup()">Sacar Saldo</button>
+    </div>
+
+    <!-- Histórico de apostas e transações -->
+    <div class="transaction-history">
+        <h3>Histórico de Apostas e Créditos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Taxa Aplicada</th>
+                    <th>Detalhes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transacao in transacoes %}
+                <tr>
+                    <td>{{ transacao['data'].strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        {% if transacao['tipo'] == 'Deposito' %}
+                        <i class="fas fa-arrow-circle-right icon"></i>
+                        {% else %}
+                        <i class="fas fa-arrow-circle-left icon icon-saque"></i>
+                        {% endif %}
+                        {{ transacao['tipo'] }}
+                    </td>
+                    <td>R$ {{ transacao['valor'] }}</td>
+                    <td>R$ {{ transacao['taxa_aplicada'] }}</td>
+                    <td>{{ transacao['detalhes'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="back-button-container">
+        <a href="{{ url_for('main.index') }}" class="back-button">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+    </div>
+</div>
+
+
+<!-- Popup para adicionar saldo -->
+<div id="walletPopup" class="wallet-popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeWalletPopup()">&times;</span>
+        <h2>Adicionar Saldo</h2>
+        <form id="walletForm" action="/adicionar_saldo" method="POST">
+            <label for="amount">Valor em Reais:</label>
+            <input type="number" id="amount" name="amount" min="1" step="0.01" required>
+            <button type="submit" class="submit-btn">Adicionar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Popup para sacar saldo -->
+<div id="withdrawPopup" class="wallet-popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeWithdrawPopup()">&times;</span>
+        <h2>Sacar Saldo</h2>
+        <form id="withdrawForm" action="/sacar_saldo" method="POST">
+            <label for="withdrawAmount">Valor a sacar:</label>
+            <input type="number" id="withdrawAmount" name="withdrawAmount" min="1" step="0.01" required>
+            <label for="bankDetails">Banco, Agência e Conta:</label>
+            <input type="text" id="bankDetails" name="bankDetails" required>
+            <button type="submit" class="submit-btn">Sacar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    function openWalletPopup() {
+        document.getElementById("walletPopup").style.display = "flex";
+    }
+    function openWithdrawPopup() {
+        document.getElementById("withdrawPopup").style.display = "flex";
+    }
+    function closeWalletPopup() {
+        document.getElementById("walletPopup").style.display = "none";
+    }
+    function closeWithdrawPopup() {
+        document.getElementById("withdrawPopup").style.display = "none";
+    }
+</script>
+
+</html>

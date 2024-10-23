@@ -1,9 +1,10 @@
 import pymongo
 from flask import render_template, request, redirect, url_for, flash, session
-from app.database import eventos_collection, usuarios_collection # Certifique-se de importar a coleção de usuários do MongoDB
+from app.database import eventos_collection, usuarios_collection, transactions_collection # Certifique-se de importar a coleção de usuários do MongoDB
 from . import main_bp  # Importando o blueprint
 from datetime import datetime
 from bson import ObjectId
+
 
 @main_bp.route('/')
 def index():
@@ -99,7 +100,71 @@ def aprovar_evento(evento_id):
     # Aprova o evento
     eventos_collection.update_one({"_id": ObjectId(evento_id)}, {"$set": {"aprovado": True}})
     flash('Evento aprovado com sucesso!')
-    return '', 204  # Retorna uma resposta vazia indicando sucesso  
+    return '', 204  # Retorna uma resposta vazia indicando sucesso
+
+@main_bp.route('/minha_carteira')
+def minha_carteira():
+    if 'usuario_id' in session:
+        usuario = usuarios_collection.find_one({"_id": ObjectId(session['usuario_id'])})
+        transacoes = transactions_collection.find({"user_id": ObjectId(session['usuario_id'])})
+        if usuario:
+            return render_template('main/minha_carteira.html', usuario=usuario, transacoes=transacoes)
+    else:
+        flash("Você precisa estar logado para acessar sua carteira.")
+        return redirect(url_for('main.index'))
+    
+def calcular_taxa(valor_saque):
+    if valor_saque <= 100:
+        return valor_saque * 0.04  # 4%
+    elif 101 <= valor_saque <= 1000:
+        return valor_saque * 0.03  # 3%
+    elif 1001 <= valor_saque <= 5000:
+        return valor_saque * 0.02  # 2%
+    elif 5001 <= valor_saque <= 100000:
+        return valor_saque * 0.01  # 1%
+    else:
+        return 0.0  # Acima de R$101.000,00 isento de taxa
+
+def registrar_transacao(user_id, tipo, valor, detalhes, taxa=0.0):
+    transacao = {
+        "user_id": ObjectId(user_id),
+        "tipo": tipo,
+        "valor": valor,
+        "data": datetime.utcnow(),
+        "detalhes": detalhes,
+        "taxa_aplicada": taxa
+    }
+    transactions_collection.insert_one(transacao)  
+    
+
+@main_bp.route('/sacar_saldo', methods=['POST'])
+def sacar_saldo():
+    if 'usuario_id' in session:
+        user_id = session['usuario_id']
+        valor_saque = float(request.form.get('withdrawAmount', 0))
+        usuario = usuarios_collection.find_one({"_id": ObjectId(user_id)})
+
+        if usuario and usuario.get('wallet_balance', 0) >= valor_saque:
+            taxa = calcular_taxa(valor_saque)  # Calcular taxa com base no valor
+            valor_total_com_taxa = valor_saque + taxa
+
+            if usuario['wallet_balance'] >= valor_total_com_taxa:
+                # Deduzir o valor do saque e a taxa da carteira
+                usuarios_collection.update_one(
+                    {"_id": ObjectId(user_id)},
+                    {"$inc": {"wallet_balance": -valor_total_com_taxa}}
+                )
+                registrar_transacao(user_id, "Saque", valor_saque, "Saque de saldo", taxa)
+                flash(f"Saque de R${valor_saque} realizado com sucesso! Taxa aplicada: R${taxa}.")
+            else:
+                flash("Saldo insuficiente para realizar o saque.")
+        else:
+            flash("Saldo insuficiente para realizar o saque.")
+        return redirect(url_for('main.minha_carteira'))
+
+    flash('Você precisa estar logado para sacar saldo.')
+    return redirect(url_for('main.index'))
+
 
 
 @main_bp.route('/adicionar_saldo', methods=['POST'])
@@ -113,7 +178,7 @@ def adicionar_saldo():
             {"_id": ObjectId(user_id)},
             {"$inc": {"wallet_balance": valor}}
         )
-        
+        registrar_transacao(user_id, "Deposito", valor, "Adicionar saldo")
         flash('Saldo adicionado com sucesso!')
         return redirect(url_for('main.index'))
     
