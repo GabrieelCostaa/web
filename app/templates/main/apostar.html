@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apostar no Evento</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<div class="apostar-evento-container">
+    <div class="back-button-container">
+        <a href="{{ url_for('main.index') }}" class="back-button">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+    </div>
+    <div class="evento-header">
+        <h1>Apostar em {{ evento['titulo'] }}</h1>
+        <p class="evento-data">Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+    </div>
+    <form action="{{ url_for('main.processar_apostar', evento_id=evento['_id']|string) }}" method="POST"
+        class="apostar-form">
+        <div class="form-group">
+            <label for="valor_aposta">Valor da Aposta:</label>
+            <input type="number" id="valor_aposta" name="valor_aposta" required>
+        </div>
+        <div class="form-group">
+            <label for="opcao_aposta">Escolha sua aposta:</label>
+            <select id="opcao_aposta" name="opcao_aposta" required>
+                <option value="" disabled selected>Selecione uma opção</option>
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+            </select>
+        </div>
+        <button type="submit" class="apostar2-btn">Apostar</button>
+    </form>
+</div>
+
+</html>

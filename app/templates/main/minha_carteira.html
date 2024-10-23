@@ -32,28 +32,85 @@
                     <th>Valor</th>
                     <th>Taxa Aplicada</th>
                     <th>Detalhes</th>
+                    <th>Opção</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for transacao in transacoes %}
                 <tr>
-                    <td>{{ transacao['data'].strftime('%d/%m/%Y %H:%M') }}</td>
+                    <!-- Data -->
                     <td>
+                        {% if transacao.get('data') %}
+                            {{ transacao['data'].strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}                  
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Tipo -->
+                    <td>
+                        {% if transacao.get('tipo') %}
                         {% if transacao['tipo'] == 'Deposito' %}
-                        <i class="fas fa-arrow-circle-right icon"></i>
+                            <i class="fas fa-arrow-circle-right icon"></i>
+                        {% elif transacao['tipo'] == 'Saque' %}
+                            <i class="fas fa-arrow-circle-left icon icon-saque"></i>
+                        {% elif transacao['tipo'] == 'Aposta' %}
+                            <i class="fa-regular fa-handshake"></i>
                         {% else %}
-                        <i class="fas fa-arrow-circle-left icon icon-saque"></i>
+                            <!-- Ícone padrão ou vazio -->
+                            <i class="fas fa-info-circle icon"></i>
                         {% endif %}
                         {{ transacao['tipo'] }}
+                    {% else %}
+                        N/A
+                    {% endif %}
                     </td>
-                    <td>R$ {{ transacao['valor'] }}</td>
-                    <td>R$ {{ transacao['taxa_aplicada'] }}</td>
-                    <td>{{ transacao['detalhes'] }}</td>
+                    
+                    <!-- Valor -->
+                    <td>
+                        {% if transacao.get('valor') is not none %}
+                            R$ {{ transacao['valor'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Taxa Aplicada -->
+                    <td>
+                        {% if transacao.get('taxa_aplicada') is not none %}
+                            R$ {{ transacao['taxa_aplicada'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Detalhes -->
+                    <td>
+                        {% if transacao.get('detalhes') %}
+                            {{ transacao['detalhes'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Opção -->
+                    <td>
+                        {% if transacao.get('opcao') %}
+                            {{ transacao['opcao'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Status -->
+                    <td>
+                        {% if transacao.get('status') %}
+                            {{ transacao['status'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    
     <div class="back-button-container">
         <a href="{{ url_for('main.index') }}" class="back-button">
             <i class="fa-solid fa-house"></i> Home
@@ -107,11 +164,11 @@
 </script>
 
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         var autoOpen = "{{ auto_open | tojson }}";  // Pega o valor do session para auto abrir o popup
-        
+
         console.log("Valor de autoOpen:", typeof autoOpen, autoOpen);  // Para verificar o valor de autoOpen no console
-        
+
         if (autoOpen === true || autoOpen === "True" || autoOpen === "true") {  // Verifica se autoOpen é explicitamente true
             console.log("Abrindo popup de saldo automaticamente");
             openWalletPopup();  // Chama a função que abre o popup

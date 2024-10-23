@@ -233,7 +233,13 @@ a {
     cursor: pointer;
     margin-top: 5px;
     font-size: 12px;
+    transition: background-color 0.3s ease;
 }
+
+.bet-btn:hover {
+    background-color: #ca6f6f;
+}
+
 
 /* Área do formulário de criação de aposta */
 .form-container {
@@ -516,8 +522,10 @@ footer {
 
 
 .back-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 20px;
-    text-align: left; /* Botão alinhado à esquerda */
 }
 
 .back-button {
@@ -534,7 +542,7 @@ footer {
 }
 
 .back-button:hover {
-    background-color: #d83f5a; /* Cor ao passar o mouse */
+    background-color: #834953; /* Cor ao passar o mouse */
 }
 
 .back-button i {
@@ -543,5 +551,91 @@ footer {
 .user-info i{
     margin-right: 2px;
 }
+
+.apostar-evento-container {
+    max-width: 500px;
+    margin: 50px auto;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Cabeçalho do evento */
+.evento-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.evento-header h1 {
+    font-size: 28px;
+    color: #333;
+}
+
+.evento-header .evento-data {
+    font-size: 16px;
+    color: #777;
+}
+
+.apostar-form .form-group {
+    margin-bottom: 20px;
+}
+
+.apostar-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: #555;
+}
+
+.apostar-form input[type="number"],
+.apostar-form select {
+    width: 100%;
+    padding: 12px 2px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #fff;
+    color: #333;
+}
+
+.apostar-form input[type="number"]:focus,
+.apostar-form select:focus {
+    outline: none;
+    border-color: #f53b57;
+}
+
+.apostar-form select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><polygon points="0,0 16,0 8,10" style="fill:%23777;" /></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+    cursor: pointer;
+}
+
+.apostar-form input[type="number"]::-webkit-inner-spin-button,
+.apostar-form input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.apostar2-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #f53b57;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.apostar2-btn:hover {
+    background-color: #834953;
+}
+
 
 

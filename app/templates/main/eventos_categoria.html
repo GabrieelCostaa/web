@@ -18,7 +18,8 @@
                 <h3>{{ evento['titulo'] }}</h3>
                 <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
                 <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
-                <button class="bet-btn">Apostar</button>
+                <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
+                            class="bet-btn">Apostar</a>
             </li>
             {% endfor %}
         </ul>

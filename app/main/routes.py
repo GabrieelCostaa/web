@@ -219,3 +219,60 @@ def eventos_por_categoria(nome_categoria):
 
     return render_template('main/eventos_categoria.html', eventos=eventos_categoria, now=now, categoria=nome_categoria)
 
+
+@main_bp.route('/apostar/<evento_id>', methods=['GET'])
+def exibir_apostar(evento_id):
+    # Verifique se o usuário está logado
+    if 'usuario_id' in session:
+        # Obtenha detalhes do evento
+        evento = eventos_collection.find_one({"_id": ObjectId(evento_id)})
+        if evento:
+            return render_template('main/apostar.html', evento=evento)  ## Pegar o id do evento e passar para apostar.html
+                                                                        ## index.html -> exibir_Aposta -> apostar.html -> processar_aposta
+        else:
+            flash("Evento não encontrado.", "danger")
+            return redirect(url_for('main.index'))
+    else:
+        flash("Você precisa estar logado para fazer uma aposta.", "danger")
+        return redirect(url_for('main.index'))
+
+    
+@main_bp.route('/apostar/<evento_id>', methods=['POST'])
+def processar_apostar(evento_id):
+    if 'usuario_id' in session:
+        # Verifique se os dados do formulário estão presentes
+        valor_aposta = float(request.form.get('valor_aposta'))
+        opcao_aposta = request.form.get('opcao_aposta')
+
+        # Obtenha o usuário e o evento
+        usuario = usuarios_collection.find_one({"_id": ObjectId(session['usuario_id'])})
+        evento = eventos_collection.find_one({"_id": ObjectId(evento_id)})
+
+        # Verifique o saldo do usuário
+        saldo_atual = usuario['wallet_balance']
+        if saldo_atual >= valor_aposta:
+            # Atualize o saldo e registre a aposta
+            novo_saldo = saldo_atual - valor_aposta
+            usuarios_collection.update_one({"_id": ObjectId(session['usuario_id'])}, {"$set": {"wallet_balance": novo_saldo}})
+
+            # Registra a aposta no histórico de transações
+            aposta = {
+                "user_id": ObjectId(session['usuario_id']),
+                "evento_id": ObjectId(evento_id),
+                "tipo": "Aposta",
+                "valor": valor_aposta,
+                "opcao": opcao_aposta,
+                "data": datetime.now(),
+                "status": "pendente"
+            }
+            transactions_collection.insert_one(aposta)
+
+            flash("Aposta realizada com sucesso!", "success")
+        else:
+            flash("Saldo insuficiente. Por favor, adicione mais saldo.", "danger")
+            return redirect(url_for('main.minha_carteira'))
+
+        return redirect(url_for('main.index'))
+    else:
+        flash("Você precisa estar logado para fazer uma aposta.", "danger")
+        return redirect(url_for('main.index'))
