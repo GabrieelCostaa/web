@@ -15,6 +15,9 @@ def index():
     else:
         usuario = None
         
+    first_login = session.get('first_login', False)
+    success = session.pop('success', False)
+    
     # Buscar todos os eventos aprovados
     eventos_aprovados = eventos_collection.find({"aprovado": True})   
         
@@ -35,7 +38,9 @@ def index():
                            eventos_proximos_de_vencer=eventos_proximos_de_vencer, 
                            eventos_mais_apostados=eventos_mais_apostados, 
                            now=now,
-                           usuario = usuario)
+                           usuario = usuario,
+                           first_login=first_login, 
+                           success=success)
 
 @main_bp.route('/addNewEvent', methods=['GET', 'POST'])
 def new_event():
@@ -180,7 +185,7 @@ def adicionar_saldo():
         )
         registrar_transacao(user_id, "Deposito", valor, "Adicionar saldo")
         flash('Saldo adicionado com sucesso!')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.minha_carteira'))
     
     flash('Você precisa estar logado para adicionar saldo.')
     return redirect(url_for('main.index'))

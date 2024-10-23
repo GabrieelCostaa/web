@@ -75,7 +75,7 @@
         <!-- Conteúdo principal -->
         <main class="content">
             <!-- Card principal de boas-vindas -->
-        
+
             <div class="search-bar">
                 <form action="/buscar_eventos" method="GET">
                     <input type="text" name="search_query" placeholder="Buscar eventos..." required>
@@ -166,6 +166,27 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+        // Verifique se o usuário está no primeiro login e se o login foi bem-sucedido
+        var firstLogin = {{ first_login | tojson }};
+        var success = {{ success | tojson }};
+    
+        if (firstLogin && success) {
+            Swal.fire({
+                title: 'Bem-vindo!',
+                text: "Você deseja adicionar saldo à sua carteira?",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, adicionar saldo',
+                cancelButtonText: 'Agora não'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ url_for('main.minha_carteira') }}";
+                }
+            });
+        }
+    </script>
 
     <script>
         function showSuccessMessage() {

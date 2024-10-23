@@ -5,17 +5,6 @@ from bson import ObjectId
 
 auth_bp = Blueprint('auth', __name__)
 
-# Função de registro do usuário
-def registrar_usuario(nome, email, senha, data_nascimento):
-    novo_usuario = {
-        "nome": nome,
-        "email": email,
-        "senha": senha,
-        "data_nascimento": data_nascimento  # Adicionando a data de nascimento
-    }
-    usuarios_collection.insert_one(novo_usuario)  # Insere no MongoDB
-
-# Rota de registro de usuário
 # Rota de registro de usuário
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -30,7 +19,8 @@ def register():
             "nome": nome,
             "email": email,
             "senha": senha,
-            "data_nascimento": data_nascimento
+            "data_nascimento": data_nascimento,
+            "primeiro_login": True
         }
         
         usuarios_collection.insert_one(novo_usuario)
@@ -56,6 +46,13 @@ def login():
         session['nome'] = usuario['nome']
         session['success'] = True
         
+            # Verifica se é o primeiro login
+        if usuario.get('primeiro_login', True):  # Se 'primeiro_login' for True, significa que é o primeiro login
+            session['first_login'] = True
+            usuarios_collection.update_one({"_id": usuario['_id']}, {"$set": {"primeiro_login": False}})
+        else:
+            session['first_login'] = False
+      
         return redirect(url_for('main.index'))
     else:
         flash('Email ou senha inválidos.')
