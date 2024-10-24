@@ -131,7 +131,10 @@ a {
 }
 
 .transaction-history .icon-saque {
-    color: #f53b57; /* Cor para saque (vermelho) */
+    color: #f53b57;
+}
+.transaction-history .icon-aposta {
+    color: #1c7ea5; 
 }
 
 .wallet-container{
@@ -579,6 +582,7 @@ footer {
 
 .apostar-form .form-group {
     margin-bottom: 20px;
+    color: #f35d5d81;
 }
 
 .apostar-form label {
@@ -635,6 +639,42 @@ footer {
 
 .apostar2-btn:hover {
     background-color: #834953;
+}
+
+.finalizar-evento-form {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #2c2c2c; 
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.radio-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.radio-options label {
+    margin-right: 20px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.finalizar-btn {
+    background-color: #ff5a5f;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.finalizar-btn:hover {
+    background-color: #ff4444;
 }
 
 

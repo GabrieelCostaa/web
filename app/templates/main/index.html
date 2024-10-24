@@ -11,16 +11,6 @@
 </head>
 
 <body>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-
     <!-- Cabeçalho -->
     <header class="top-nav">
         <div class="logo">Minha Plataforma</div>
@@ -53,10 +43,12 @@
     </header>
 
     <div class="main-container">
+        {% if session.get('moderador') %}
+        <button class="create-bet-btn" onclick="window.location.href='/eventos_pendentes'">Ver Eventos Pendentes</button>
+        {% endif %}
         <!-- Sidebar -->
         <aside class="sidebar">
             <button class="create-bet-btn" onclick="window.location.href='/addNewEvent'">Criar Aposta</button>
-            <button class="ver-pendentes-btn" onclick="window.location.href='/eventos_pendentes'">Ver Pendentes</button>
             <h3>Eventos</h3>
             <ul class="menu">
                 {% for evento in eventos %}
@@ -65,7 +57,23 @@
                     <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
                     <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
                     <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
-                            class="bet-btn">Apostar</a>
+                        class="bet-btn">Apostar</a>
+                        {% if session.get('moderador') %}
+                        <form action="{{ url_for('main.finalizar_evento', evento_id=evento['_id']|string) }}" method="POST" class="finalizar-evento-form">
+                            <div class="form-group">
+                                <label>O evento ocorreu?</label>
+                                <div class="radio-options">
+                                    <label for="sim">
+                                        <input type="radio" name="resultado" value="sim" id="sim"> Sim
+                                    </label>
+                                    <label for="nao">
+                                        <input type="radio" name="resultado" value="nao" id="nao"> Não
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="bet-btn finalizar-btn">Finalizar Evento</button>
+                        </form>
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -78,7 +86,7 @@
                     <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
                     <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
                     <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
-                            class="bet-btn">Apostar</a>
+                        class="bet-btn">Apostar</a>
                 </li>
                 {% endfor %}
             </ul>
@@ -87,7 +95,6 @@
         <!-- Conteúdo principal -->
         <main class="content">
             <!-- Card principal de boas-vindas -->
-
             <div class="search-bar">
                 <form action="/buscar_eventos" method="GET">
                     <input type="text" name="search_query" placeholder="Buscar eventos..." required>
@@ -103,6 +110,7 @@
                     <li>
                         <h3>{{ evento['titulo'] }}</h3>
                         <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                        <p>Participantes: {{ evento['num_apostas'] }}</p>
                         <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
                             class="bet-btn">Apostar</a>
                     </li>
@@ -179,6 +187,18 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            console.log("{{ category }} - Message: {{ message }}");
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        });
+    </script>
 
     <script type="text/javascript">
         // Verifique se o usuário está no primeiro login e se o login foi bem-sucedido

@@ -22,6 +22,7 @@
     </div>
 
     <!-- Histórico de apostas e transações -->
+    <!-- Histórico de apostas e transações -->
     <div class="transaction-history">
         <h3>Histórico de Apostas e Créditos</h3>
         <table>
@@ -42,66 +43,68 @@
                     <!-- Data -->
                     <td>
                         {% if transacao.get('data') %}
-                            {{ transacao['data'].strftime('%d/%m/%Y %H:%M') }}
-                        {% else %}                  
+                        {{ transacao['data'].strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
                         {% endif %}
                     </td>
-                    
+
                     <!-- Tipo -->
                     <td>
                         {% if transacao.get('tipo') %}
                         {% if transacao['tipo'] == 'Deposito' %}
-                            <i class="fas fa-arrow-circle-right icon"></i>
+                        <i class="fas fa-arrow-circle-right icon"></i>
                         {% elif transacao['tipo'] == 'Saque' %}
-                            <i class="fas fa-arrow-circle-left icon icon-saque"></i>
+                        <i class="fas fa-arrow-circle-left icon icon-saque"></i>
                         {% elif transacao['tipo'] == 'Aposta' %}
-                            <i class="fa-regular fa-handshake"></i>
+                        <i class="fa-regular fa-handshake icon icon-aposta"></i>
+                        {% elif transacao['tipo'] == 'Lucro' %}
+                        <i class="fa-solid fa-dollar-sign icon"></i> 
                         {% else %}
-                            <!-- Ícone padrão ou vazio -->
-                            <i class="fas fa-info-circle icon"></i>
+                        <!-- Ícone padrão ou vazio -->
+                        <i class="fas fa-info-circle icon"></i>
                         {% endif %}
                         {{ transacao['tipo'] }}
-                    {% else %}
+                        {% else %}
                         N/A
-                    {% endif %}
+                        {% endif %}
                     </td>
-                    
+
                     <!-- Valor -->
                     <td>
                         {% if transacao.get('valor') is not none %}
-                            R$ {{ transacao['valor'] }}
+                        R$ {{ transacao['valor'] }}
                         {% else %}
                         {% endif %}
                     </td>
-                    
+
                     <!-- Taxa Aplicada -->
                     <td>
                         {% if transacao.get('taxa_aplicada') is not none %}
-                            R$ {{ transacao['taxa_aplicada'] }}
+                        R$ {{ transacao['taxa_aplicada'] }}
                         {% else %}
                         {% endif %}
                     </td>
-                    
+
                     <!-- Detalhes -->
                     <td>
                         {% if transacao.get('detalhes') %}
-                            {{ transacao['detalhes'] }}
+                        {{ transacao['detalhes'] }}
                         {% else %}
                         {% endif %}
                     </td>
-                    
+
                     <!-- Opção -->
                     <td>
                         {% if transacao.get('opcao') %}
-                            {{ transacao['opcao'] }}
+                        {{ transacao['opcao'] }}
                         {% else %}
                         {% endif %}
                     </td>
-                    
+
                     <!-- Status -->
                     <td>
                         {% if transacao.get('status') %}
-                            {{ transacao['status'] }}
+                        {{ transacao['status'] }}
                         {% else %}
                         {% endif %}
                     </td>
@@ -110,7 +113,8 @@
             </tbody>
         </table>
     </div>
-    
+
+
     <div class="back-button-container">
         <a href="{{ url_for('main.index') }}" class="back-button">
             <i class="fa-solid fa-house"></i> Home
@@ -138,14 +142,39 @@
         <span class="close" onclick="closeWithdrawPopup()">&times;</span>
         <h2>Sacar Saldo</h2>
         <form id="withdrawForm" action="/sacar_saldo" method="POST">
+            <!-- Valor a Sacar -->
             <label for="withdrawAmount">Valor a sacar:</label>
             <input type="number" id="withdrawAmount" name="withdrawAmount" min="1" step="0.01" required>
-            <label for="bankDetails">Banco, Agência e Conta:</label>
-            <input type="text" id="bankDetails" name="bankDetails" required>
+
+            <!-- Escolha o método de saque -->
+            <label for="withdrawMethod">Escolha o método de saque:</label>
+            <select id="withdrawMethod" name="withdrawMethod" onchange="toggleWithdrawMethod()" required>
+                <option value="" disabled selected>Selecione uma opção</option>
+                <option value="bank">Banco (Agência/Conta Corrente)</option>
+                <option value="pix">Pix <i class="fa-brands fa-pix"></i></option>
+            </select>
+
+            <!-- Detalhes do Banco (Exibido apenas se Banco for selecionado) -->
+            <div id="bankDetails" style="display:none;">
+                <label for="bankAgency">Agência:</label>
+                <input type="text" id="bankAgency" name="bankAgency">
+                
+                <label for="bankAccount">Conta Corrente:</label>
+                <input type="text" id="bankAccount" name="bankAccount">
+            </div>
+
+            <!-- Detalhes do Pix (Exibido apenas se Pix for selecionado) -->
+            <div id="pixDetails" style="display:none;">
+                <label for="pixKey">Chave Pix:</label>
+                <input type="text" id="pixKey" name="pixKey">
+            </div>
+
+            <!-- Botão de Saque -->
             <button type="submit" class="submit-btn">Sacar</button>
         </form>
     </div>
 </div>
+
 
 <script>
 
@@ -160,6 +189,22 @@
     }
     function closeWithdrawPopup() {
         document.getElementById("withdrawPopup").style.display = "none";
+    }
+    function toggleWithdrawMethod() {
+        var method = document.getElementById("withdrawMethod").value;
+        var bankDetails = document.getElementById("bankDetails");
+        var pixDetails = document.getElementById("pixDetails");
+
+        if (method === "bank") {
+            bankDetails.style.display = "block";
+            pixDetails.style.display = "none";
+        } else if (method === "pix") {
+            bankDetails.style.display = "none";
+            pixDetails.style.display = "block";
+        } else {
+            bankDetails.style.display = "none";
+            pixDetails.style.display = "none";
+        }
     }
 </script>
 
@@ -177,6 +222,49 @@
         }
     });
 </script>
+
+<style>
+    /* Estilizando o select */
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: #fff;
+        border: 2px solid #d84343;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+        color: #333;
+        width: 100%;
+        outline: none;
+        transition: border-color 0.3s ease-in-out;
+    }
+
+    /* Adicionando ícone de seta para baixo */
+    select::after {
+        content: '\25BC';  /* Unicode para a seta para baixo */
+        position: absolute;
+        right: 10px;
+        top: calc(50% - 10px); /* Centralizando verticalmente */
+        pointer-events: none;
+    }
+
+    /* Estilo no hover e foco */
+    select:hover, select:focus {
+        border-color: #d63333;
+    }
+
+    /* Estilizando a opção */
+    option {
+        padding: 10px;
+    }
+
+    /* Estilizando o container ao redor */
+    .popup-content select {
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+</style>
 
 
 </html>

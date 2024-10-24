@@ -20,7 +20,8 @@ def register():
             "email": email,
             "senha": senha,
             "data_nascimento": data_nascimento,
-            "primeiro_login": True
+            "primeiro_login": True,
+            "moderador": False
         }
         
         usuarios_collection.insert_one(novo_usuario)
@@ -49,7 +50,8 @@ def login():
         # Armazena o _id do usuário e o nome na sessão
         session['usuario_id'] = str(usuario['_id'])  # Converte o ObjectId para string
         session['nome'] = usuario['nome']
-        session['success'] = True
+        session['moderador'] = usuario['moderador']    #  Moderador
+        session['success'] = True   # Logado com sucesso
         
             # Verifica se é o primeiro login
         if usuario.get('primeiro_login', True):  # Se 'primeiro_login' for True, significa que é o primeiro login
