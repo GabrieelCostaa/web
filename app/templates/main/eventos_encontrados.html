@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados da Busca</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Resultados da Busca</h1>
+    </header>
+
+    <div class="menu">
+        {% if eventos %}
+        <ul>
+            {% for evento in eventos %}
+            <li>
+                <h3>{{ evento['titulo'] }}</h3>
+                <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
+                <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
+                            class="bet-btn">Apostar</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Nenhum evento encontrado para "{{ request.args.get('search_query') }}".</p>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Minha Plataforma de Apostas</p>
+    </footer>
+</body>
+</html>

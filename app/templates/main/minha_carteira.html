@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha carteira</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<div class="wallet-container">
+    <h2>Minha Carteira</h2>
+
+    <div class="wallet-info">
+        <p>Saldo atual: R$ {{ usuario['wallet_balance'] | default(0) }}</p>
+    </div>
+
+    <div class="wallet-actions">
+        <button class="add-funds-btn" onclick="openWalletPopup()">Adicionar Créditos</button>
+        <button class="withdraw-funds-btn" onclick="openWithdrawPopup()">Sacar Saldo</button>
+    </div>
+
+    <!-- Histórico de apostas e transações -->
+    <!-- Histórico de apostas e transações -->
+    <div class="transaction-history">
+        <h3>Histórico de Apostas e Créditos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Taxa Aplicada</th>
+                    <th>Detalhes</th>
+                    <th>Opção</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transacao in transacoes %}
+                <tr>
+                    <!-- Data -->
+                    <td>
+                        {% if transacao.get('data') %}
+                        {{ transacao['data'].strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+
+                    <!-- Tipo -->
+                    <td>
+                        {% if transacao.get('tipo') %}
+                        {% if transacao['tipo'] == 'Deposito' %}
+                        <i class="fas fa-arrow-circle-right icon"></i>
+                        {% elif transacao['tipo'] == 'Saque' %}
+                        <i class="fas fa-arrow-circle-left icon icon-saque"></i>
+                        {% elif transacao['tipo'] == 'Aposta' %}
+                        <i class="fa-regular fa-handshake icon icon-aposta"></i>
+                        {% elif transacao['tipo'] == 'Lucro' %}
+                        <i class="fa-solid fa-dollar-sign icon"></i>
+                        {% else %}
+                        <!-- Ícone padrão ou vazio -->
+                        <i class="fas fa-info-circle icon"></i>
+                        {% endif %}
+                        {{ transacao['tipo'] }}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </td>
+
+                    <!-- Valor -->
+                    <td>
+                        {% if transacao.get('valor') is not none %}
+                        R$ {{ transacao['valor'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+
+                    <!-- Taxa Aplicada -->
+                    <td>
+                        {% if transacao.get('taxa_aplicada') is not none %}
+                        R$ {{ transacao['taxa_aplicada'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+
+                    <!-- Detalhes -->
+                    <td>
+                        {% if transacao.get('detalhes') %}
+                        {{ transacao['detalhes'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+
+                    <!-- Opção -->
+                    <td>
+                        {% if transacao.get('opcao') %}
+                        {{ transacao['opcao'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        {% if transacao.get('status') %}
+                        {{ transacao['status'] }}
+                        {% else %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="back-button-container">
+        <a href="{{ url_for('main.index') }}" class="back-button">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+    </div>
+</div>
+
+
+<!-- Popup para adicionar saldo -->
+<div id="walletPopup" class="wallet-popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeWalletPopup()">&times;</span>
+        <h2>Adicionar Saldo</h2>
+        <form id="walletForm" action="/adicionar_saldo" method="POST">
+            <label for="amount">Valor em Reais:</label>
+            <input type="number" id="amount" name="amount" min="1" step="0.01" required>
+            <button type="submit" class="submit-btn">Adicionar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Popup para sacar saldo -->
+<div id="withdrawPopup" class="wallet-popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeWithdrawPopup()">&times;</span>
+        <h2>Sacar Saldo</h2>
+        <form id="withdrawForm" action="/sacar_saldo" method="POST">
+            <!-- Valor a Sacar -->
+            <label for="withdrawAmount">Valor a sacar:</label>
+            <input type="number" id="withdrawAmount" name="withdrawAmount" min="1" step="0.01" required>
+
+            <!-- Escolha o método de saque -->
+            <label for="withdrawMethod">Escolha o método de saque:</label>
+            <select id="withdrawMethod" name="withdrawMethod" onchange="toggleWithdrawMethod()" required>
+                <option value="" disabled selected>Selecione uma opção</option>
+                <option value="bank">Banco (Agência/Conta Corrente)</option>
+                <option value="pix">Pix <i class="fa-brands fa-pix"></i></option>
+            </select>
+
+            <!-- Detalhes do Banco (Exibido apenas se Banco for selecionado) -->
+            <div id="bankDetails" style="display:none;">
+                <label for="bankAgency">Agência:</label>
+                <input type="text" id="bankAgency" name="bankAgency">
+
+                <label for="bankAccount">Conta Corrente:</label>
+                <input type="text" id="bankAccount" name="bankAccount">
+            </div>
+
+            <!-- Detalhes do Pix (Exibido apenas se Pix for selecionado) -->
+            <div id="pixDetails" style="display:none;">
+                <label for="pixKey">Chave Pix:</label>
+                <input type="text" id="pixKey" name="pixKey">
+            </div>
+
+            <!-- Botão de Saque -->
+            <button type="submit" class="submit-btn">Sacar</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+
+    function openWalletPopup() {
+        document.getElementById("walletPopup").style.display = "flex";
+    }
+    function openWithdrawPopup() {
+        document.getElementById("withdrawPopup").style.display = "flex";
+    }
+    function closeWalletPopup() {
+        document.getElementById("walletPopup").style.display = "none";
+    }
+    function closeWithdrawPopup() {
+        document.getElementById("withdrawPopup").style.display = "none";
+    }
+    function toggleWithdrawMethod() {
+        var method = document.getElementById("withdrawMethod").value;
+        var bankDetails = document.getElementById("bankDetails");
+        var pixDetails = document.getElementById("pixDetails");
+
+        if (method === "bank") {
+            bankDetails.style.display = "block";
+            pixDetails.style.display = "none";
+        } else if (method === "pix") {
+            bankDetails.style.display = "none";
+            pixDetails.style.display = "block";
+        } else {
+            bankDetails.style.display = "none";
+            pixDetails.style.display = "none";
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        var autoOpen = "{{ auto_open | tojson }}";  // Pega o valor do session para auto abrir o popup
+
+        console.log("Valor de autoOpen:", typeof autoOpen, autoOpen);  // Para verificar o valor de autoOpen no console
+
+        if (autoOpen === true || autoOpen === "True" || autoOpen === "true") {  // Verifica se autoOpen é explicitamente true
+            console.log("Abrindo popup de saldo automaticamente");
+            openWalletPopup();  // Chama a função que abre o popup
+        } else {
+            console.log("Nenhuma ação necessária para autoOpen");
+        }
+    });
+</script>
+
+<style>
+    /* Estilizando o select */
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: #fff;
+        border: 2px solid #d84343;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+        color: #333;
+        width: 100%;
+        outline: none;
+        transition: border-color 0.3s ease-in-out;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><polygon points="0,0 16,0 8,10" style="fill:%23777;" /></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px;
+        cursor: pointer;
+    }
+
+    /* Adicionando ícone de seta para baixo */
+    select::after {
+        content: '\25BC';
+        /* Unicode para a seta para baixo */
+        position: absolute;
+        right: 10px;
+        top: calc(50% - 10px);
+        /* Centralizando verticalmente */
+        pointer-events: none;
+    }
+
+    /* Estilo no hover e foco */
+    select:hover,
+    select:focus {
+        border-color: #d63333;
+    }
+
+    /* Estilizando a opção */
+    option {
+        padding: 10px;
+    }
+
+    /* Estilizando o container ao redor */
+    .popup-content select {
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+</style>
+
+
+</html>

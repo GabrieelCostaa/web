@@ -1,20 +1,10 @@
-from flask import render_template, request, redirect, url_for, flash, Blueprint
+from flask import render_template, request, redirect, url_for, flash, Blueprint, session
 from app.database import usuarios_collection  # Certifique-se de importar a coleção de usuários do MongoDB
 from werkzeug.security import generate_password_hash, check_password_hash
+from bson import ObjectId
 
 auth_bp = Blueprint('auth', __name__)
 
-# Função de registro do usuário
-def registrar_usuario(nome, email, senha, data_nascimento):
-    novo_usuario = {
-        "nome": nome,
-        "email": email,
-        "senha": senha,
-        "data_nascimento": data_nascimento  # Adicionando a data de nascimento
-    }
-    usuarios_collection.insert_one(novo_usuario)  # Insere no MongoDB
-
-# Rota de registro de usuário
 # Rota de registro de usuário
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -29,7 +19,9 @@ def register():
             "nome": nome,
             "email": email,
             "senha": senha,
-            "data_nascimento": data_nascimento
+            "data_nascimento": data_nascimento,
+            "primeiro_login": True,
+            "moderador": False
         }
         
         usuarios_collection.insert_one(novo_usuario)
@@ -37,6 +29,11 @@ def register():
         # Mensagem de sucesso e redireciona de volta para o index
         flash('Usuário registrado com sucesso!', 'success')
         return redirect(url_for('main.index'))  # Redireciona para a rota principal (index)
+    
+@auth_bp.route('/set_auto_open', methods=['POST'])
+def set_auto_open():
+    session['auto_open'] = True  # Ativa o auto_open para abrir o popup
+    return '', 204  # Retorna uma resposta vazia e um status 204 No Content
 
 # Rota para login de usuário
 @auth_bp.route('/login', methods=['POST'])
@@ -49,9 +46,31 @@ def login():
 
     if usuario and usuario['senha'] == senha:
         flash('Login realizado com sucesso!')
-        # Aqui você pode iniciar a sessão ou redirecionar para uma página protegida
-        return redirect(url_for('main_bp.index'))
+        
+        # Armazena o _id do usuário e o nome na sessão
+        session['usuario_id'] = str(usuario['_id'])  # Converte o ObjectId para string
+        session['nome'] = usuario['nome']
+        session['moderador'] = usuario['moderador']    #  Moderador
+        session['success'] = True   # Logado com sucesso
+        
+            # Verifica se é o primeiro login
+        if usuario.get('primeiro_login', True):  # Se 'primeiro_login' for True, significa que é o primeiro login
+            session['first_login'] = True
+            usuarios_collection.update_one({"_id": usuario['_id']}, {"$set": {"primeiro_login": False}})
+        else:
+            session['first_login'] = False
+      
+        return redirect(url_for('main.index'))
     else:
         flash('Email ou senha inválidos.')
-        return redirect(url_for('main_bp.index'))
+        session['error'] = True
+        return redirect(url_for('main.index'))
+    
+    
+@auth_bp.route('/logout')
+def logout():
+    # Limpa a sessão do usuário
+    session.clear()
+    flash('Você saiu da sua conta.')
+    return redirect(url_for('main.index'))
 

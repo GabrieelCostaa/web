@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Inicial - Plataforma de Apostas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Cabeçalho -->
     <header class="top-nav">
@@ -16,65 +20,117 @@
                 <li><a href="#">Esportes</a></li>
             </ul>
         </nav>
+        {% if session.get('nome') %}
+        <div class="user-wallet">
+            <div class="user-info">
+                <span class="welcome-user">Bem-vindo, {{ session['nome'] }}!</span>
+                <!-- Exibe o saldo da wallet do usuário -->
+                <span class="wallet-info">Saldo: R$ {{ usuario['wallet_balance'] | default(0) }}</span>
+                <a href="{{ url_for('main.minha_carteira') }}" class="logout-btn">
+                    <i class="fa-solid fa-wallet"></i> Minha Carteira</a>
+                <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Exibe os botões de login e cadastro -->
         <div class="auth-buttons">
             <button class="login-btn" onclick="openLoginPopup()">Entrar</button>
             <button class="signup-btn" onclick="openSignupPopup()">Cadastre-se</button>
         </div>
+        {% endif %}
     </header>
 
     <div class="main-container">
+        {% if session.get('moderador') %}
+        <button class="create-bet-btn" onclick="window.location.href='/eventos_pendentes'">Ver Eventos Pendentes</button>
+        {% endif %}
         <!-- Sidebar -->
         <aside class="sidebar">
             <button class="create-bet-btn" onclick="window.location.href='/addNewEvent'">Criar Aposta</button>
+            <h3>Eventos</h3>
             <ul class="menu">
+                {% for evento in eventos %}
                 <li>
-                    <h3>Final Campeonato</h3>
-                    <p>Restam 2 dias para o fim das apostas.</p>
-                    <button class="bet-btn">Apostar</button>
+                    <h3>{{ evento['titulo'] }}</h3>
+                    <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                    <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
+                    <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
+                        class="bet-btn">Apostar</a>
+                        {% if session.get('moderador') %}
+                        <form action="{{ url_for('main.finalizar_evento', evento_id=evento['_id']|string) }}" method="POST" class="finalizar-evento-form">
+                            <div class="form-group">
+                                <label>O evento ocorreu?</label>
+                                <div class="radio-options">
+                                    <label for="sim">
+                                        <input type="radio" name="resultado" value="sim" id="sim"> Sim
+                                    </label>
+                                    <label for="nao">
+                                        <input type="radio" name="resultado" value="nao" id="nao"> Não
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="bet-btn finalizar-btn">Finalizar Evento</button>
+                        </form>
+                    {% endif %}
                 </li>
+                {% endfor %}
+            </ul>
+
+            <h3>Próximos de Vencer</h3>
+            <ul class="menu">
+                {% for evento in eventos_proximos_de_vencer %}
                 <li>
-                    <h3>Eleição Presidencial</h3>
-                    <p>Restam 5 dias para o fim das apostas.</p>
-                    <button class="bet-btn">Apostar</button>
+                    <h3>{{ evento['titulo'] }}</h3>
+                    <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                    <p>Restam {{ (evento['fim_apostas'] - now).days }} dias para o fim das apostas.</p>
+                    <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
+                        class="bet-btn">Apostar</a>
                 </li>
-                <li>
-                    <h3>Bolsa de Valores</h3>
-                    <p>Ações subindo ou caindo em 24 horas.</p>
-                    <button class="bet-btn">Apostar</button>
-                </li>
-                <li>
-                    <h3>Olimpíadas - Natação</h3>
-                    <p>Quem ganhará o ouro?</p>
-                    <button class="bet-btn">Apostar</button>
-                </li>
+                {% endfor %}
             </ul>
         </aside>
 
         <!-- Conteúdo principal -->
         <main class="content">
             <!-- Card principal de boas-vindas -->
-            <section class="welcome-card">
-                <div class="card">
-                    <h1>Bem-vindo à Plataforma de Apostas!</h1>
-                    <p>Cadastre-se e receba bônus de depósito de até R$ 1.000!</p>
-                    <div class="action-buttons">
-                        <button class="signup-btn-large" onclick="openSignupPopup()">CADASTRE-SE</button>
-                        <button class="google-btn">G</button>
-                    </div>
-                </div>
+            <div class="search-bar">
+                <form action="/buscar_eventos" method="GET">
+                    <input type="text" name="search_query" placeholder="Buscar eventos..." required>
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>
+
+            <!-- Seção de eventos mais apostados -->
+            <section class="most-bet-events">
+                <h2>Eventos Mais Apostados</h2>
+                <ul class="menu">
+                    {% for evento in eventos_mais_apostados %}
+                    <li>
+                        <h3>{{ evento['titulo'] }}</h3>
+                        <p>Data do evento: {{ evento['data_evento'].strftime('%d/%m/%Y') }}</p>
+                        <p>Participantes: {{ evento['num_apostas'] }}</p>
+                        <a href="{{ url_for('main.exibir_apostar', evento_id=evento['_id']|string) }}"
+                            class="bet-btn">Apostar</a>
+                    </li>
+                    {% endfor %}
+                </ul>
             </section>
 
-            <!-- Seção de categorias e links -->
+            <!-- Seção de categorias -->
             <section class="categories-cards">
-                <div class="card">
-                    <h2>Cassino</h2>
-                    <p>Aproveite nossa seleção exclusiva de slots, dealers ao vivo e jogos originais.</p>
-                    <button class="category-btn">IR AO CASSINO</button>
+                <div class="card" onclick="window.location.href='/eventos/categoria/Olimpiadas'">
+                    <h2>Olimpíadas</h2>
+                    <p>Eventos relacionados às Olimpíadas.</p>
                 </div>
-                <div class="card">
-                    <h2>Esportes</h2>
-                    <p>Nossas apostas esportivas intuitivas são feitas para jogadores novos e experientes.</p>
-                    <button class="category-btn">IR PARA ESPORTES</button>
+                <div class="card" onclick="window.location.href='/eventos/categoria/Eleicoes'">
+                    <h2>Eleições</h2>
+                    <p>Eventos relacionados às Eleições.</p>
+                </div>
+                <div class="card" onclick="window.location.href='/eventos/categoria/Futebol'">
+                    <h2>Futebol</h2>
+                    <p>Eventos relacionados à Futebol.</p>
                 </div>
             </section>
         </main>
@@ -103,20 +159,104 @@
         <div class="popup-content">
             <span class="close" onclick="closePopup('loginPopup')">&times;</span>
             <h2>Login na Plataforma</h2>
-            <form action="/login" method="POST">  <!-- Envia o formulário para a rota /login -->
+            <form action="{{ url_for('auth.login') }}" method="POST"> <!-- Envia o formulário para a rota /login -->
                 <input type="email" name="email" placeholder="Endereço de Email" required>
                 <input type="password" name="senha" placeholder="Senha" required>
-                
+
                 <button type="submit" class="submit-btn">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup para adicionar saldo -->
+    <div id="walletPopup" class="wallet-popup">
+        <div class="popup-content">
+            <span class="close" onclick="closeWalletPopup()">&times;</span>
+            <h2>Adicionar Saldo</h2>
+            <form id="walletForm" action="/adicionar_saldo" method="POST">
+                <label for="amount">Valor em Reais:</label>
+                <input type="number" id="amount" name="amount" min="1" step="0.01" required>
+                <button type="submit" class="submit-btn">Adicionar</button>
             </form>
         </div>
     </div>
 
     <footer>
         <div class="footer-content">
-            <p>Método de Pagamento Preferido</p>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            console.log("{{ category }} - Message: {{ message }}");
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        });
+    </script>
+
+    <script type="text/javascript">
+        // Verifique se o usuário está no primeiro login e se o login foi bem-sucedido
+        var firstLogin = {{ first_login | tojson }};
+        var success = {{ success | tojson }};
+
+        if (firstLogin && success) {
+            Swal.fire({
+                title: 'Bem-vindo!',
+                text: "Você deseja adicionar saldo à sua carteira?",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, adicionar saldo',
+                cancelButtonText: 'Agora não'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Se o usuário confirmar, redireciona para a página de carteira e ativa o `session['auto_open']
+                    fetch("{{ url_for('auth.set_auto_open') }}", {  // Chama o endpoint para setar a session
+                        method: 'POST'
+                    }).then(() => {
+                        window.location.href = "{{ url_for('main.minha_carteira') }}";
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function showSuccessMessage() {
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Login realizado com sucesso.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        function showFailureMessage() {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Email ou Senha invalida.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
+
+    <script>
+        var success = {{ session.pop('success', False) | tojson }};
+        if (success) {
+            showSuccessMessage();
+        }
+
+        var error = {{ session.pop('error', False) | tojson }};
+        if (error) {
+            showFailureMessage();
+        }
+    </script>
 
     <script>
         // Funções para abrir e fechar os popups
@@ -133,4 +273,5 @@
         }
     </script>
 </body>
+
 </html>
