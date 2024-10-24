@@ -1,4 +1,11 @@
-# Ignore __pycache__ directories
+# Ignorar diretórios da venv
+.venv/
+venv/
+
+# Ignorar diretórios de cache do Python
 __pycache__/
+app/__pycache__/
+
+# Ignorar arquivos compilados do Python
 *.pyc
 *.pyo
