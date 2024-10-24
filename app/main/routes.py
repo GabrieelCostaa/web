@@ -7,9 +7,6 @@ from bson import ObjectId
 import smtplib
 from email.mime.text import MIMEText
 
-@main_bp.before_request
-def clear_session_on_restart():
-    session.clear()  # Limpa a sessão ao reiniciar
 
 @main_bp.route('/')
 def index():
