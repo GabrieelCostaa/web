@@ -58,7 +58,7 @@
                         {% elif transacao['tipo'] == 'Aposta' %}
                         <i class="fa-regular fa-handshake icon icon-aposta"></i>
                         {% elif transacao['tipo'] == 'Lucro' %}
-                        <i class="fa-solid fa-dollar-sign icon"></i> 
+                        <i class="fa-solid fa-dollar-sign icon"></i>
                         {% else %}
                         <!-- Ícone padrão ou vazio -->
                         <i class="fas fa-info-circle icon"></i>
@@ -158,7 +158,7 @@
             <div id="bankDetails" style="display:none;">
                 <label for="bankAgency">Agência:</label>
                 <input type="text" id="bankAgency" name="bankAgency">
-                
+
                 <label for="bankAccount">Conta Corrente:</label>
                 <input type="text" id="bankAccount" name="bankAccount">
             </div>
@@ -238,19 +238,27 @@
         width: 100%;
         outline: none;
         transition: border-color 0.3s ease-in-out;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><polygon points="0,0 16,0 8,10" style="fill:%23777;" /></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px;
+        cursor: pointer;
     }
 
     /* Adicionando ícone de seta para baixo */
     select::after {
-        content: '\25BC';  /* Unicode para a seta para baixo */
+        content: '\25BC';
+        /* Unicode para a seta para baixo */
         position: absolute;
         right: 10px;
-        top: calc(50% - 10px); /* Centralizando verticalmente */
+        top: calc(50% - 10px);
+        /* Centralizando verticalmente */
         pointer-events: none;
     }
 
     /* Estilo no hover e foco */
-    select:hover, select:focus {
+    select:hover,
+    select:focus {
         border-color: #d63333;
     }
 
