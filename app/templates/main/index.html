@@ -12,35 +12,7 @@
 
 <body>
     <!-- Cabeçalho -->
-    <header class="top-nav">
-        <div class="logo">Minha Plataforma</div>
-        <nav>
-            <ul>
-                <li><a href="#">Cassino</a></li>
-                <li><a href="#">Esportes</a></li>
-            </ul>
-        </nav>
-        {% if session.get('nome') %}
-        <div class="user-wallet">
-            <div class="user-info">
-                <span class="welcome-user">Bem-vindo, {{ session['nome'] }}!</span>
-                <!-- Exibe o saldo da wallet do usuário -->
-                <span class="wallet-info">Saldo: R$ {{ usuario['wallet_balance'] | default(0) }}</span>
-                <a href="{{ url_for('main.minha_carteira') }}" class="logout-btn">
-                    <i class="fa-solid fa-wallet"></i> Minha Carteira</a>
-                <a href="{{ url_for('auth.logout') }}" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Sair
-                </a>
-            </div>
-        </div>
-        {% else %}
-        <!-- Exibe os botões de login e cadastro -->
-        <div class="auth-buttons">
-            <button class="login-btn" onclick="openLoginPopup()">Entrar</button>
-            <button class="signup-btn" onclick="openSignupPopup()">Cadastre-se</button>
-        </div>
-        {% endif %}
-    </header>
+    {% include 'main/header.html' %}
 
     <div class="main-container">
         {% if session.get('moderador') %}
